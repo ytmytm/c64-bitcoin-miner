@@ -39,6 +39,8 @@ Based on [stacksmashing's work on Bitcoin mining with Game Boy](https://www.yout
 Just load and run `miner.prg` in VICE and press 'd' for demo mode. In about 30 minutes (at 100% emulation speed)
 you will reach nonce $0000019d, for which the hashed block value is smaler than the test target.
 
+Don't forget to **verify md5 sum of the downloaded file**! You wouldn't want your precious C64 computation power to be hijacked by hackers.
+
 ## How to run the miner from within VICE emulator
 
 VICE's x64 emulator can send/receive RS232 communication over TCP socket. My version of ngbtminer will wait for
