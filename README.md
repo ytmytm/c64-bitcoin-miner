@@ -11,8 +11,6 @@ It can run in demo mode or communicate with [ngbtminer for C64](https://github.c
 
 ![Success](assets/success.png)
 
-## Success
-
 # Pros & cons
 
 ## Pros
