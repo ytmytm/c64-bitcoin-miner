@@ -11,6 +11,8 @@ It can run in demo mode or communicate with [ngbtminer for C64](https://github.c
 
 ![Success](assets/success.png)
 
+*A C64 would need 337 years and 10 months to reach this result*
+
 # Pros & cons
 
 ## Pros
