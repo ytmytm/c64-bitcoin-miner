@@ -7,7 +7,7 @@ It can run in demo mode or communicate with [ngbtminer] over serial link (1200 b
 
 # Screenshots
 
-![At work](assets/working.PNG)
+![At work](assets/working.png)
 
 ![Success](assets/success.png)
 
