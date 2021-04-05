@@ -6,6 +6,8 @@
 #define CHUNK_SIZE 64
 #define TOTAL_LEN_LEN 8
 
+#define uint32_t unsigned long
+
 /*
  * ABOUT bool: this file does not use bool in order to be as pre-C99 compatible as possible.
  */
@@ -34,11 +36,11 @@ struct buffer_state {
 	const uint8_t * p;
 	size_t len;
 	size_t total_len;
-	int single_one_delivered; /* bool */
-	int total_len_delivered; /* bool */
+	uint8_t single_one_delivered; /* bool */
+	uint8_t total_len_delivered; /* bool */
 };
 
-static inline uint32_t right_rot(uint32_t value, unsigned int count)
+static uint32_t __fastcall__ right_rot(uint32_t value, uint8_t count)
 {
 	/*
 	 * Defined behaviour in standard C for all count where 0 < count < 32,
@@ -47,7 +49,7 @@ static inline uint32_t right_rot(uint32_t value, unsigned int count)
 	return value >> count | value << (32 - count);
 }
 
-static void init_buf_state(struct buffer_state * state, const void * input, size_t len)
+static void __fastcall__ init_buf_state(struct buffer_state * state, const void * input, size_t len)
 {
 	state->p = input;
 	state->len = len;
@@ -57,7 +59,7 @@ static void init_buf_state(struct buffer_state * state, const void * input, size
 }
 
 /* Return value: bool */
-static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
+static uint8_t __fastcall__ calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 {
 	size_t space_in_chunk;
 
@@ -94,7 +96,7 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
 		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
 		size_t len = state->total_len;
-		int i;
+		int8_t i;
 		memset(chunk, 0x00, left);
 		chunk += left;
 
@@ -121,7 +123,7 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
  *   for bit string lengths that are not multiples of eight, and it really operates on arrays of bytes.
  *   In particular, the len parameter is a number of bytes.
  */
-void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
+void __fastcall__ calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 {
 	/*
 	 * Note 1: All integers (expect indexes) are 32-bit unsigned integers and addition is calculated modulo 2^32.
@@ -137,7 +139,7 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 * (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
 	 */
 	uint32_t h[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
-	unsigned i, j;
+	uint8_t i, j;
 
 	/* 512-bit chunks is what we will operate on. */
 	uint8_t chunk[64];
@@ -174,6 +176,8 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 			 */
 			uint32_t w[16];
 
+			uint32_t s0, s1, ch, temp1, temp2, maj;
+
 			for (j = 0; j < 16; j++) {
 				if (i == 0) {
 					w[j] = (uint32_t) p[0] << 24 | (uint32_t) p[1] << 16 |
@@ -181,16 +185,16 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 					p += 4;
 				} else {
 					/* Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array: */
-					const uint32_t s0 = right_rot(w[(j + 1) & 0xf], 7) ^ right_rot(w[(j + 1) & 0xf], 18) ^ (w[(j + 1) & 0xf] >> 3);
-					const uint32_t s1 = right_rot(w[(j + 14) & 0xf], 17) ^ right_rot(w[(j + 14) & 0xf], 19) ^ (w[(j + 14) & 0xf] >> 10);
+					s0 = right_rot(w[(j + 1) & 0xf], 7) ^ right_rot(w[(j + 1) & 0xf], 18) ^ (w[(j + 1) & 0xf] >> 3);
+					s1 = right_rot(w[(j + 14) & 0xf], 17) ^ right_rot(w[(j + 14) & 0xf], 19) ^ (w[(j + 14) & 0xf] >> 10);
 					w[j] = w[j] + s0 + w[(j + 9) & 0xf] + s1;
 				}
-				const uint32_t s1 = right_rot(ah[4], 6) ^ right_rot(ah[4], 11) ^ right_rot(ah[4], 25);
-				const uint32_t ch = (ah[4] & ah[5]) ^ (~ah[4] & ah[6]);
-				const uint32_t temp1 = ah[7] + s1 + ch + k[i << 4 | j] + w[j];
-				const uint32_t s0 = right_rot(ah[0], 2) ^ right_rot(ah[0], 13) ^ right_rot(ah[0], 22);
-				const uint32_t maj = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2]);
-				const uint32_t temp2 = s0 + maj;
+			       	s1 = right_rot(ah[4], 6) ^ right_rot(ah[4], 11) ^ right_rot(ah[4], 25);
+				ch = (ah[4] & ah[5]) ^ (~ah[4] & ah[6]);
+				temp1 = ah[7] + s1 + ch + k[i << 4 | j] + w[j];
+				s0 = right_rot(ah[0], 2) ^ right_rot(ah[0], 13) ^ right_rot(ah[0], 22);
+				maj = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2]);
+				temp2 = s0 + maj;
 
 				ah[7] = ah[6];
 				ah[6] = ah[5];

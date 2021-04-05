@@ -8,5 +8,5 @@
 
 #ifndef SHA256_H
 #define SHA256_H
-void calc_sha_256(uint8_t hash[32], const void *input, size_t len);
+void __fastcall__ calc_sha_256(uint8_t hash[32], const void *input, size_t len);
 #endif   // SHA256_H
