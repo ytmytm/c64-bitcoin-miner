@@ -5,6 +5,14 @@ This is a Bitcoin miner for C64.
 
 It can run in demo mode or communicate with [ngbtminer] over serial link (1200 baud, 8N1) to access Bitcoin blockchain.
 
+# Screenshots
+
+![At work](assets/working.PNG)
+
+![Success](assets/success.png)
+
+## Success
+
 # Pros & cons
 
 ## Pros
