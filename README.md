@@ -1,8 +1,9 @@
 
 # C64 Bitcoin miner
 
-This is a Bitcoin miner for C64. It can run in demo mode or communicate with [ngbtminer] over serial link (1200 baud, 8N1)
-to access Bitcoin blockchain.
+This is a Bitcoin miner for C64.
+
+It can run in demo mode or communicate with [ngbtminer] over serial link (1200 baud, 8N1) to access Bitcoin blockchain.
 
 # Pros & cons
 
@@ -41,7 +42,7 @@ Alternatively you can run the test code: `python3 test_ngbtminer.py` to mine one
 1. Start ngbtminer / test_ngbtminer
 2. Run VICE's x64, load and run `miner.prg`
 3. Setup Vice:
-    - Settings -> RS232 settings -> RS232 settings -> RS232 device 1 -> set to <ngbtminer ip>:25233, for example `192.168.2.54:25233`
+    - Settings -> RS232 settings -> RS232 settings -> RS232 device 1 -> set to NGBTMINER_IP:25233, for example `192.168.2.54:25233`
     - Settings -> RS232 settings -> RS232 user port settings:
        - Enable RS232 userport emulation
        - Userport device - RS232 device 1
