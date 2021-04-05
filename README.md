@@ -41,7 +41,7 @@ Don't forget to **verify md5 sum of the downloaded file**! You wouldn't want you
 
 ## How to run the miner from within VICE emulator
 
-VICE's x64 emulator can send/receive RS232 communication over TCP socket. My version of ngbtminer will wait for
+VICE's x64 emulator can send/receive RS232 communication over TCP socket. [My version of ngbtminer](https://github.com/ytmytm/c64-ntgbtminer) will wait for
 connections on port 25233.
 
 Setup ngbtminer to connect to your bitcoind (or your mining pool), see original project for more info.
@@ -59,7 +59,7 @@ Alternatively you can run the test code: `python3 test_ngbtminer.py` to mine one
 
 ## Is this a joke?
 
-No, it really does the same thing that every other miner:
+No, it really does the same thing that every other miner does:
 
 1. Receive block data to be hashed (76 bytes)
 2. Append 32-bit nonce at the end
