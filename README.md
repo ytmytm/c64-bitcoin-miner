@@ -37,7 +37,7 @@ Based on [stacksmashing's work on Bitcoin mining with Game Boy](https://www.yout
 ## How to quickly check it out?
 
 Just load and run `miner.prg` in VICE and press 'd' for demo mode. In about 30 minutes (at 100% emulation speed)
-you will reach nonce $0000019d, for which the hashed block value is smaler than the test target.
+you will reach nonce value $0000019d, for which the hashed block value is smaler than the test target.
 
 Don't forget to **verify md5 sum of the downloaded file**! You wouldn't want your precious C64 computation power to be hijacked by hackers.
 
