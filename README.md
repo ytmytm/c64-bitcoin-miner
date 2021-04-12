@@ -3,7 +3,7 @@
 
 This is a Bitcoin miner for C64.
 
-It can run in demo mode or communicate with [ngbtminer] over serial link (1200 baud, 8N1) to access Bitcoin blockchain.
+It can run in demo mode or communicate with [ngbtminer for C64](https://github.com/ytmytm/c64-ntgbtminer) over serial link (1200 baud, 8N1) to access Bitcoin blockchain.
 
 # Screenshots
 
@@ -11,7 +11,7 @@ It can run in demo mode or communicate with [ngbtminer] over serial link (1200 b
 
 ![Success](assets/success.png)
 
-## Success
+*A C64 would need 337 years and 10 months to reach this result*
 
 # Pros & cons
 
@@ -37,11 +37,13 @@ Based on [stacksmashing's work on Bitcoin mining with Game Boy](https://www.yout
 ## How to quickly check it out?
 
 Just load and run `miner.prg` in VICE and press 'd' for demo mode. In about 30 minutes (at 100% emulation speed)
-you will reach nonce $0000019d, for which the hashed block value is smaler than the test target.
+you will reach nonce value $0000019d, for which the hashed block value is smaler than the test target.
+
+Don't forget to **verify md5 sum of the downloaded file**! You wouldn't want your precious C64 computation power to be hijacked by hackers.
 
 ## How to run the miner from within VICE emulator
 
-VICE's x64 emulator can send/receive RS232 communication over TCP socket. My version of ngbtminer will wait for
+VICE's x64 emulator can send/receive RS232 communication over TCP socket. [My version of ngbtminer](https://github.com/ytmytm/c64-ntgbtminer) will wait for
 connections on port 25233.
 
 Setup ngbtminer to connect to your bitcoind (or your mining pool), see original project for more info.
@@ -59,7 +61,7 @@ Alternatively you can run the test code: `python3 test_ngbtminer.py` to mine one
 
 ## Is this a joke?
 
-No, it really does the same thing that every other miner:
+No, it really does the same thing that every other miner does:
 
 1. Receive block data to be hashed (76 bytes)
 2. Append 32-bit nonce at the end
