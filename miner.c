@@ -381,6 +381,9 @@ uint8_t c;
     cputsxy(1,10,"Press any other key to continue");
     cputsxy(0,23,"Inspired by stacksmasher's GameBoy miner");
 
+    // use this time to generate right rotation lookup data for sha2.c
+    generate_rot_tables();
+
     c = cgetc();
     if (c=='d' || c=='D') {
         miner_demo();

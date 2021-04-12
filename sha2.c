@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "sha2.h"
 
@@ -40,13 +41,77 @@ struct buffer_state {
 	uint8_t total_len_delivered; /* bool */
 };
 
-static uint32_t __fastcall__ right_rot(uint32_t value, uint8_t count)
+// compliant right rotation, doesn't have to be very efficient
+static uint32_t right_rot_gen(uint32_t value, uint8_t count)
 {
-	/*
-	 * Defined behaviour in standard C for all count where 0 < count < 32,
-	 * which is what we need here.
-	 */
 	return value >> count | value << (32 - count);
+}
+
+// lookup table pointers
+char *rot_lobytes[8];
+char *rot_hibytes[8];
+
+// generate lookup tables for right_rot (hi / lo for every byte for 8 possible rotations)
+void generate_rot_tables(void) {
+	uint32_t j;
+	uint8_t hi;
+	uint8_t lo;
+	uint8_t c;
+	size_t i;
+
+	for (c=0;c<8;c++) {
+		// allocate and clear
+		rot_lobytes[c] = malloc(256);
+		rot_hibytes[c] = malloc(256);
+		memset(rot_lobytes[c],0,256);
+		memset(rot_hibytes[c],0,256);
+
+		for (i=0;i<256;i++) {
+			j = i << 8;
+			j = right_rot_gen(j, c);
+			hi = (j & 0xff00) >> 8;
+			lo = (j & 0x00ff);
+			rot_lobytes[c][i] = lo;
+			rot_hibytes[c][i] = hi;
+		}
+	}
+}
+
+// static allocation for right_rot
+uint32_t right_rotbuf;
+uint8_t *r = (uint8_t*)&right_rotbuf;
+uint8_t tmp;
+uint8_t c;
+uint8_t *rot_lo;
+uint8_t *rot_hi;
+
+uint32_t right_rot(uint32_t value, uint8_t count) {
+	// not portable, assuming little-endianness (works for 6502 and x86/x64)
+	right_rotbuf = value;
+	c = count;
+	if (c>=24) {
+		c = c - 24;
+		tmp = r[0]; r[0] = r[3]; r[3] = r[2]; r[2] = r[1]; r[1] = tmp;
+	}
+	if (c>=16) {
+		c = c - 16;
+		tmp = r[0]; r[0] = r[2]; r[2] = tmp;
+		tmp = r[1]; r[1] = r[3]; r[3] = tmp;
+	}
+	if (c>=8) {
+		c = c - 8;
+		tmp = r[0]; r[0] = r[1]; r[1] = r[2]; r[2] = r[3]; r[3] = tmp;
+	}
+	if (c>0) {
+		rot_lo = rot_lobytes[c];
+		rot_hi = rot_hibytes[c];
+		 tmp = rot_lo[r[0]];
+		r[0] = rot_hi[r[0]] | rot_lo[r[1]];
+		r[1] = rot_hi[r[1]] | rot_lo[r[2]];
+		r[2] = rot_hi[r[2]] | rot_lo[r[3]];
+		r[3] = rot_hi[r[3]] | tmp;
+	}
+	return right_rotbuf;
 }
 
 static void __fastcall__ init_buf_state(struct buffer_state * state, const void * input, size_t len)
@@ -61,7 +126,7 @@ static void __fastcall__ init_buf_state(struct buffer_state * state, const void 
 /* Return value: bool */
 static uint8_t __fastcall__ calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 {
-	register size_t space_in_chunk;
+	size_t space_in_chunk;
 
 	if (state->total_len_delivered) {
 		return 0;
@@ -94,9 +159,9 @@ static uint8_t __fastcall__ calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_
 	 * In the latter case, we will conclude at the next invokation of this function.
 	 */
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
-		register const size_t left = space_in_chunk - TOTAL_LEN_LEN;
-		register size_t len = state->total_len;
-		register int8_t i;
+		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
+		size_t len = state->total_len;
+		int8_t i;
 		memset(chunk, 0x00, left);
 		chunk += left;
 
@@ -138,20 +203,20 @@ void __fastcall__ calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 * Initialize hash values:
 	 * (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
 	 */
-	register uint32_t h[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
-	register uint8_t i, j;
+	uint32_t h[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+	uint8_t i, j;
 
 	/* 512-bit chunks is what we will operate on. */
-	register uint8_t chunk[64];
+	uint8_t chunk[64];
 
-	register struct buffer_state state;
+	struct buffer_state state;
 
 	init_buf_state(&state, input, len);
 
 	while (calc_chunk(chunk, &state)) {
-		register uint32_t ah[8];
+		uint32_t ah[8];
 
-		register const uint8_t *p = chunk;
+		const uint8_t *p = chunk;
 
 		/* Initialize working variables to current hash value: */
 		for (i = 0; i < 8; i++)
@@ -174,9 +239,9 @@ void __fastcall__ calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 			 * (The initial values in w[0..63] don't matter, so many implementations zero them here)
 			 * copy chunk into first 16 words w[0..15] of the message schedule array
 			 */
-			register uint32_t w[16];
+			uint32_t w[16];
 
-			register uint32_t s0, s1, ch, temp1, temp2, maj;
+			uint32_t s0, s1, ch, temp1, temp2, maj;
 
 			for (j = 0; j < 16; j++) {
 				if (i == 0) {
