@@ -61,7 +61,7 @@ static void __fastcall__ init_buf_state(struct buffer_state * state, const void 
 /* Return value: bool */
 static uint8_t __fastcall__ calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 {
-	size_t space_in_chunk;
+	register size_t space_in_chunk;
 
 	if (state->total_len_delivered) {
 		return 0;
@@ -94,9 +94,9 @@ static uint8_t __fastcall__ calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_
 	 * In the latter case, we will conclude at the next invokation of this function.
 	 */
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
-		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
-		size_t len = state->total_len;
-		int8_t i;
+		register const size_t left = space_in_chunk - TOTAL_LEN_LEN;
+		register size_t len = state->total_len;
+		register int8_t i;
 		memset(chunk, 0x00, left);
 		chunk += left;
 
@@ -138,20 +138,20 @@ void __fastcall__ calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 * Initialize hash values:
 	 * (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
 	 */
-	uint32_t h[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
-	uint8_t i, j;
+	register uint32_t h[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+	register uint8_t i, j;
 
 	/* 512-bit chunks is what we will operate on. */
-	uint8_t chunk[64];
+	register uint8_t chunk[64];
 
-	struct buffer_state state;
+	register struct buffer_state state;
 
 	init_buf_state(&state, input, len);
 
 	while (calc_chunk(chunk, &state)) {
-		uint32_t ah[8];
+		register uint32_t ah[8];
 
-		const uint8_t *p = chunk;
+		register const uint8_t *p = chunk;
 
 		/* Initialize working variables to current hash value: */
 		for (i = 0; i < 8; i++)
@@ -174,9 +174,9 @@ void __fastcall__ calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 			 * (The initial values in w[0..63] don't matter, so many implementations zero them here)
 			 * copy chunk into first 16 words w[0..15] of the message schedule array
 			 */
-			uint32_t w[16];
+			register uint32_t w[16];
 
-			uint32_t s0, s1, ch, temp1, temp2, maj;
+			register uint32_t s0, s1, ch, temp1, temp2, maj;
 
 			for (j = 0; j < 16; j++) {
 				if (i == 0) {
