@@ -140,7 +140,7 @@ void setup_screen(void) {
     SCREEN_RAM[21*40]=107;  SCREEN_RAM[21*40+39]=115;
     // labels
     textcolor(COLOR_CYAN);
-    cputsxy(2,1,"Bitcoin Miner 64 v1.0 ");
+    cputsxy(2,1,"Bitcoin Miner 64 v1.2 ");
     textcolor(COLOR_GRAY3);
     cputs("by ");
     textcolor(COLOR_GREEN);
