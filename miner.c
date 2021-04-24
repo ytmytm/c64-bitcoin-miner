@@ -305,6 +305,7 @@ void miner(void) {
 
     memset(block_header, 0, 80);
     memset(target, 0, 32);
+    nonce = 0;
 
     while(1) {
         setup_screen();
@@ -349,6 +350,7 @@ void miner_demo(void) {
     memset(target, 0xff, 32);
     target[0]=0;
     target[1]=0x7f;
+    nonce = 0;
 
     while(1) {
         setup_screen();
