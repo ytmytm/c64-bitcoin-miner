@@ -7,7 +7,7 @@ It can run in demo mode or communicate with [ngbtminer for C64](https://github.c
 
 # Screenshots
 
-*Note: hashing is 20% faster than in this version, takes 3.6s for each round.*
+*Note: hashing is 20% faster than in this version, takes 3.6s for each round. [see here how it was done](https://hackaday.io/project/178828-bitcoin-mining-on-a-c64/log/191679-speeding-up-by-20-profitability-almost-reached)*
 
 ![At work](assets/working.png)
 
