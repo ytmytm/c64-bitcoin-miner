@@ -381,7 +381,7 @@ uint8_t c;
     cputsxy(1,8,"1. Setup 1200 baud 8N1 RS232 connection");
     cputsxy(1,9,"2. Start ntgbtminer on the remote end");
     cputsxy(1,10,"Press any other key to continue");
-    cputsxy(0,23,"Inspired by stacksmasher's GameBoy miner");
+    cputsxy(0,23,"Inspired by stacksmashing's GameBoy miner");
 
     // use this time to generate right rotation lookup data for sha2.c
     generate_rot_tables();
